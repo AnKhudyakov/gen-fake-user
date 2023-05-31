@@ -8,17 +8,19 @@ function App() {
   const [mistakes, setMistakes] = useState(0);
   const [seed, setSeed] = useState(0);
   const [users, setUsers] = useState([]);
+  const [usersWithMistakes, setUsersWithMistakes] = useState([]);
   const [random, setRandom] = useState(0);
   const handleInputSlider = (e) => {
-    setMistakes(e.target.value);
+    setMistakes(+e.target.value);
   };
   const handleInput = (e) => {
-    e.target.value < 1000 ? setMistakes(e.target.value) : setMistakes(1000);
+    +e.target.value < 1000 ? setMistakes(+e.target.value) : setMistakes(1000);
   };
   const handleSeed = (e) => {
     setSeed(e.target.value);
   };
   const handleRandom = () => {
+    setMistakes(0)
     setRandom(+seed);
     faker.seed(random);
   };
@@ -29,9 +31,27 @@ function App() {
       })
     );
   }, [random]);
-  console.log("REF",users[0]);
-  console.log("RESULT",users.length? new Mistakes(mistakes,users[0]).userWithMistakes : "");
 
+  useEffect(() => {
+    if (mistakes > 0) {
+      const newUsers = users.map((user) => {
+        let n = 0;
+        let newUser = user;
+        let count = mistakes;
+        if (Math.random() < mistakes % 1) {
+          count = Math.floor(mistakes) + 1;
+        }
+        while (n < count) {
+          n++;
+          newUser = new Mistakes(mistakes, newUser).userWithMistakes;
+        }
+        return newUser;
+      });
+      setUsersWithMistakes(newUsers);
+    } else {
+      setUsersWithMistakes(users);
+    }
+  }, [mistakes]);
   return (
     <div className="container mx-auto py-4 px-5 text-center">
       <div
@@ -115,7 +135,7 @@ function App() {
           Random
         </button>
       </div>
-      <Table users={users} />
+      <Table users={mistakes ? usersWithMistakes : users} />
     </div>
   );
 }

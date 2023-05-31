@@ -1,9 +1,11 @@
+import { faker } from "@faker-js/faker";
+
 let chrs = "abdehkmnpswxzABDEFGHKMNPQRSTWXZ123456789";
 let fields = ["username", "state", "city", "street", "phone"];
 
 export class Mistakes {
   constructor(p, user) {
-    //this.p = p;
+    this.p = p;
     this.user = user;
     this.field = this.getField();
     this.value = user[this.field];
@@ -13,11 +15,11 @@ export class Mistakes {
     return { ...this.user, [this.field]: this.fieldWithMistakes };
   }
   getField = () => {
-    const fieldIndex = Math.floor(Math.random() * fields.length);
+    const fieldIndex = faker.number.int(fields.length - 1);
     return fields[fieldIndex];
   };
   genFields = (user) => {
-    const typeMistake = Math.floor(Math.random() * 3);
+    const typeMistake = faker.number.int(2);
     switch (typeMistake) {
       case 0:
         return this.removeChar(this.field, this.value);
@@ -30,18 +32,18 @@ export class Mistakes {
 
   removeChar = (field, value) => {
     const index = this.getRandomIndex(value);
-    console.log("remove", value);
+    //console.log("REMOVE");
     return value.slice(0, index - 1) + value.slice(index);
   };
   addChar = (field, value) => {
     const index = this.getRandomIndex(value);
     const char = this.genChar(chrs);
-    console.log("add", char, value);
+    //  console.log("ADD");
     return value.slice(0, index) + char + value.slice(index);
   };
   swapChars = (field, value) => {
     const index = this.getRandomIndex(value);
-    console.log("SWAP", index, value);
+    //console.log("SWAP");
     if (index === value.length - 1) {
       let first = value[index - 1];
       let second = value[index];
@@ -61,6 +63,6 @@ export class Mistakes {
     return str.slice(index, index + 1);
   };
   getRandomIndex(str) {
-    return Math.floor(Math.random() * str.length);
+    return faker.number.int(str.length - 1);
   }
 }

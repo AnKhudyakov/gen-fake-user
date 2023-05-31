@@ -3,9 +3,21 @@ const User = ({ user, index }) => {
     <tr>
       <th>{index + 1}</th>
       <td>{user.userId}</td>
-      <td>{user.username}</td>
-      <td>{user.state}, {user.city}, {user.street}</td>
-      <td>{user.phone}</td>
+      <td>
+        <div style={{ maxWidth: "250px", wordWrap: "break-word" }}>
+          {user.username}
+        </div>
+      </td>
+      <td>
+        <div style={{ maxWidth: "350px", wordWrap: "break-word" }}>
+          {user.state}, {user.city}, {user.street}
+        </div>
+      </td>
+      <td>
+        <div style={{ maxWidth: "250px", wordWrap: "break-word" }}>
+          {user.phone}
+        </div>
+      </td>
     </tr>
   );
 };
