@@ -1,15 +1,24 @@
 import { useEffect, useState } from "react";
 import Table from "../Table/Table";
-import { faker } from "@faker-js/faker";
-import { createRandomUser } from "../../helpers/faker";
-import { Mistakes } from "../../helpers/genMistakes";
+import { getUsers } from "@/helpers/faker";
+import { Mistakes } from "@/helpers/genMistakes";
+import Toolbar from "../Toolbar/Toolbar";
+import { useInView } from "react-intersection-observer";
+import { fakerEN } from "@faker-js/faker";
+import { en } from "@/helpers/translation";
+import { ExportToCsv } from "export-to-csv";
+
 function App() {
-  const [local, setLocal] = useState("en");
   const [mistakes, setMistakes] = useState(0);
   const [seed, setSeed] = useState(0);
   const [users, setUsers] = useState([]);
   const [usersWithMistakes, setUsersWithMistakes] = useState([]);
   const [random, setRandom] = useState(0);
+  const [faker, setFaker] = useState(fakerEN);
+  const [locale, setLocale] = useState(en);
+  const { ref, inView, entry } = useInView({
+    threshold: 0.5,
+  });
   const handleInputSlider = (e) => {
     setMistakes(+e.target.value);
   };
@@ -20,17 +29,31 @@ function App() {
     setSeed(e.target.value);
   };
   const handleRandom = () => {
-    setMistakes(0)
+    setMistakes(0);
     setRandom(+seed);
     faker.seed(random);
   };
+
+  const handleCSV = () => {
+    const data = mistakes ? usersWithMistakes : users;
+    const options = {
+      fieldSeparator: ",",
+      quoteStrings: '"',
+      decimalSeparator: ".",
+      showLabels: true,
+      showTitle: true,
+      title: "Gen Random Users CSV",
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+    };
+    const csvExporter = new ExportToCsv(options);
+    csvExporter.generateCsv(data);
+  };
+
   useEffect(() => {
-    setUsers(
-      faker.helpers.multiple(createRandomUser, {
-        count: 20,
-      })
-    );
-  }, [random]);
+    setUsers(getUsers(faker, 20));
+  }, [random, faker]);
 
   useEffect(() => {
     if (mistakes > 0) {
@@ -52,39 +75,26 @@ function App() {
       setUsersWithMistakes(users);
     }
   }, [mistakes]);
+
+  useEffect(() => {
+    if (entry) {
+      if (inView) {
+        setUsers([...users, ...getUsers(faker, 10)]);
+      }
+    }
+  }, [inView]);
+
   return (
-    <div className="container mx-auto py-4 px-5 text-center">
-      <div
-        className="d-flex flex-wrap align-items-center 
-        justify-content-center justify-content-lg-start gap-3 mb-3"
-      >
-        <button
-          type="button"
-          className={local === "en" ? "btn btn-secondary" : "btn btn-primary"}
-          onClick={() => setLocal("en")}
-        >
-          USA
-        </button>
-        <button
-          type="button"
-          className={
-            local === "ka_GE" ? "btn btn-secondary" : "btn btn-primary"
-          }
-          onClick={() => setLocal("ka_GE")}
-        >
-          Georgia
-        </button>
-        <button
-          type="button"
-          className={local === "de" ? "btn btn-secondary" : "btn btn-primary"}
-          onClick={() => setLocal("de")}
-        >
-          Germany
-        </button>
-      </div>
+    <div className="container mx-auto py-4 px-2 text-center">
+      <Toolbar
+        faker={faker}
+        setFaker={setFaker}
+        locale={locale}
+        setLocale={setLocale}
+      />
       <div className="bg-light mb-5">
         <label htmlFor="probability" className="form-label">
-          Probability of mistakes
+          {locale.label_prob}
         </label>
         <div
           className="container d-flex align-items-center justify-content-center
@@ -115,7 +125,7 @@ function App() {
           onChange={handleInput}
         />
         <label htmlFor="seed" className="form-label">
-          Seed
+          {locale.seed}
         </label>
         <input
           className="form-control mx-auto mb-3"
@@ -132,10 +142,16 @@ function App() {
           className="btn btn-primary"
           onClick={handleRandom}
         >
-          Random
+          {locale.button}
         </button>
+        <div className="py-3">
+          <button className="btn btn-success" onClick={handleCSV}>
+            {locale.csv}
+          </button>
+        </div>
       </div>
-      <Table users={mistakes ? usersWithMistakes : users} />
+      <Table users={mistakes ? usersWithMistakes : users} locale={locale} />
+      <div className="container" ref={ref} style={{ height: "20px" }}></div>
     </div>
   );
 }

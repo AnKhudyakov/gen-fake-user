@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "bootstrap": "^5.2.3",
+    "export-to-csv": "^0.2.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-intersection-observer": "^9.4.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.0.2",

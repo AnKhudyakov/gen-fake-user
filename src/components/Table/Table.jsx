@@ -1,24 +1,25 @@
-import { useState } from "react";
 import User from "../User/User";
 
-const Table = ({ users }) => {
+const Table = ({ users, locale }) => {
   return (
     <div className="table-responsive bg-light">
-      <table
-        className="table table-responsive table-borderless"
-      >
+      <table className="table table-responsive table-borderless">
         <thead className="table-dark">
           <tr className="bg-light">
-            <th scope="col" width="5%">№</th>
-            <th scope="col" width="10%">id</th>
+            <th scope="col" width="5%">
+              №
+            </th>
+            <th scope="col" width="10%">
+              {locale.id}
+            </th>
             <th scope="col" width="30%">
-              Full Name
+              {locale.name}
             </th>
             <th scope="col" width="25%">
-              Address
+              {locale.address}
             </th>
             <th scope="col" width="25%">
-              Phone
+              {locale.phone}
             </th>
           </tr>
         </thead>
