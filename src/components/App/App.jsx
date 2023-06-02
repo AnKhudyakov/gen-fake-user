@@ -11,7 +11,7 @@ import { ExportToCsv } from "export-to-csv";
 function App() {
   const [mistakes, setMistakes] = useState(0);
   const [users, setUsers] = useState([]);
-  const [usersWithMistakes, setUsersWithMistakes] = useState([]);
+  const [usersWithMistakes, setUsersWithMistakes] = useState(users);
   const [faker, setFaker] = useState(fakerEN);
   const [seed, setSeed] = useState(faker.number.int(99999));
   const [locale, setLocale] = useState(en);
@@ -54,6 +54,16 @@ function App() {
     setUsers(getUsers(faker, 20));
   }, [seed, faker]);
   useEffect(() => {
+    if (entry) {
+      if (inView) {
+        setPage(page + 1);
+        console.log(page);
+        faker.seed(seed + page);
+        setUsers([...users, ...getUsers(faker, 10)]);
+      }
+    }
+  }, [inView]);
+  useEffect(() => {
     if (mistakes > 0) {
       const newUsers = users.map((user) => {
         let n = 0;
@@ -72,17 +82,7 @@ function App() {
     } else {
       setUsersWithMistakes(users);
     }
-  }, [mistakes]);
-  useEffect(() => {
-    if (entry) {
-      if (inView) {
-        setPage(page + 1);
-        console.log(page);
-        faker.seed(seed + page);
-        setUsers([...users, ...getUsers(faker, 10)]);
-      }
-    }
-  }, [inView]);
+  }, [mistakes, users]);
   return (
     <div className="container mx-auto py-4 px-2 text-center">
       <Toolbar
@@ -149,7 +149,7 @@ function App() {
           </button>
         </div>
       </div>
-      <Table users={mistakes ? usersWithMistakes : users} locale={locale} />
+      <Table users={usersWithMistakes} locale={locale} />
       <div className="container" ref={ref} style={{ height: "20px" }}></div>
     </div>
   );
