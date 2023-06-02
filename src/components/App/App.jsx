@@ -28,11 +28,12 @@ function App() {
   };
   const handleSeed = (e) => {
     +e.target.value < 99999 ? setSeed(+e.target.value) : setSeed(99999);
-    faker.seed(seed);
+    setPage(1);
   };
   const handleRandom = () => {
     setMistakes(0);
     setSeed(faker.number.int(99999));
+    setPage(1);
   };
   const handleCSV = () => {
     const data = mistakes ? usersWithMistakes : users;
