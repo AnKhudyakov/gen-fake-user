@@ -10,15 +10,16 @@ import { ExportToCsv } from "export-to-csv";
 
 function App() {
   const [mistakes, setMistakes] = useState(0);
-  const [seed, setSeed] = useState(0);
   const [users, setUsers] = useState([]);
   const [usersWithMistakes, setUsersWithMistakes] = useState([]);
-  const [random, setRandom] = useState(0);
   const [faker, setFaker] = useState(fakerEN);
+  const [seed, setSeed] = useState(faker.number.int(99999));
   const [locale, setLocale] = useState(en);
+  const [page, setPage] = useState(1);
   const { ref, inView, entry } = useInView({
     threshold: 0.5,
   });
+  faker.seed(seed);
   const handleInputSlider = (e) => {
     setMistakes(+e.target.value);
   };
@@ -26,14 +27,13 @@ function App() {
     +e.target.value < 1000 ? setMistakes(+e.target.value) : setMistakes(1000);
   };
   const handleSeed = (e) => {
-    setSeed(e.target.value);
+    +e.target.value < 99999 ? setSeed(+e.target.value) : setSeed(99999);
+    faker.seed(seed);
   };
   const handleRandom = () => {
     setMistakes(0);
-    setRandom(+seed);
-    faker.seed(random);
+    setSeed(faker.number.int(99999));
   };
-
   const handleCSV = () => {
     const data = mistakes ? usersWithMistakes : users;
     const options = {
@@ -50,11 +50,9 @@ function App() {
     const csvExporter = new ExportToCsv(options);
     csvExporter.generateCsv(data);
   };
-
   useEffect(() => {
     setUsers(getUsers(faker, 20));
-  }, [random, faker]);
-
+  }, [seed, faker]);
   useEffect(() => {
     if (mistakes > 0) {
       const newUsers = users.map((user) => {
@@ -75,15 +73,16 @@ function App() {
       setUsersWithMistakes(users);
     }
   }, [mistakes]);
-
   useEffect(() => {
     if (entry) {
       if (inView) {
+        setPage(page + 1);
+        console.log(page);
+        faker.seed(seed + page);
         setUsers([...users, ...getUsers(faker, 10)]);
       }
     }
   }, [inView]);
-
   return (
     <div className="container mx-auto py-4 px-2 text-center">
       <Toolbar
@@ -133,7 +132,7 @@ function App() {
           type="number"
           name="amountInput"
           min="0"
-          max="1000"
+          max="99999"
           value={seed}
           onChange={handleSeed}
         />
