@@ -57,7 +57,6 @@ function App() {
     if (entry) {
       if (inView) {
         setPage(page + 1);
-        console.log(page);
         faker.seed(seed + page);
         setUsers([...users, ...getUsers(faker, 10)]);
       }
